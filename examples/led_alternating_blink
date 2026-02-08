@@ -1,0 +1,37 @@
+
+#include <stdint.h>
+
+/* Register addresses */
+#define RCC_AHB1ENR   (*(volatile uint32_t*)0x40023830)
+#define GPIOA_MODER   (*(volatile uint32_t*)0x40020000)
+#define GPIOA_ODR     (*(volatile uint32_t*)0x40020014)
+
+int main(void)
+{
+    /* Enable GPIOA clock */
+    RCC_AHB1ENR |= (1 << 0);
+
+    /* PA5 as output */
+    GPIOA_MODER &= ~(3 << (5 * 2));
+    GPIOA_MODER |=  (1 << (5 * 2));
+
+    /* PA6 as output */
+    GPIOA_MODER &= ~(3 << (6 * 2));
+    GPIOA_MODER |=  (1 << (6 * 2));
+
+    while (1)
+    {
+        /* LED on PA5 ON, PA6 OFF */
+        GPIOA_ODR |=  (1 << 5);
+        GPIOA_ODR &= ~(1 << 6);
+
+        for (volatile int i = 0; i < 1500000; i++);
+
+        /* LED on PA5 OFF, PA6 ON */
+        GPIOA_ODR &= ~(1 << 5);
+        GPIOA_ODR |=  (1 << 6);
+
+        for (volatile int i = 0; i < 1500000; i++);
+    }
+}
+
